@@ -1203,6 +1203,7 @@ def v1_chat_generate_response(
     cache_report=False,
     tool_call_parser=None,
     reasoning_parser=None,
+    debug=False,
 ):
     choices = []
 
@@ -1373,6 +1374,15 @@ def v1_chat_generate_response(
         )
         completion_tokens = sum(item["meta_info"]["completion_tokens"] for item in ret)
         cached_tokens = sum(item["meta_info"].get("cached_tokens", 0) for item in ret)
+
+        intermediate_layer_outputs = None
+        if debug:
+            intermediate_layer_outputs = []
+            for item in ret:
+                intermediate_layer_outputs.append(
+                    item["meta_info"].get("intermediate_layer_outputs", [])
+                )
+        
         response = ChatCompletionResponse(
             id=ret[0]["meta_info"]["id"],
             created=created,
@@ -1385,13 +1395,14 @@ def v1_chat_generate_response(
                 prompt_tokens_details=(
                     {"cached_tokens": cached_tokens} if cache_report else None
                 ),
+                intermediate_layer_outputs=intermediate_layer_outputs
             ),
         )
         return response
 
 
 async def v1_chat_completions(
-    tokenizer_manager, raw_request: Request, cache_report=False
+    tokenizer_manager, raw_request: Request, cache_report=False, debug=False,
 ):
     try:
         request_json = await raw_request.json()
@@ -1733,6 +1744,7 @@ async def v1_chat_completions(
         cache_report=tokenizer_manager.server_args.enable_cache_report,
         tool_call_parser=tokenizer_manager.server_args.tool_call_parser,
         reasoning_parser=tokenizer_manager.server_args.reasoning_parser,
+        debug=debug,
     )
 
     return response

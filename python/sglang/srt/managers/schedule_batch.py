@@ -564,6 +564,9 @@ class Req:
         # We use `tmp_end_idx` to store the end index of the kv cache to send.
         self.tmp_end_idx: int = -1
 
+        # Intermediate layer outputs from the model for debugging
+        self.intermediate_layer_outputs: List[List[List[float]]] = []
+
     @property
     def seqlen(self):
         return len(self.origin_input_ids) + len(self.output_ids)

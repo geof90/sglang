@@ -286,6 +286,7 @@ class Qwen2Model(nn.Module):
         else:
             hidden_states = input_embeds
         residual = None
+        intermediate_outputs = []
         for i in range(len(self.layers)):
             layer = self.layers[i]
             hidden_states, residual = layer(
@@ -294,8 +295,11 @@ class Qwen2Model(nn.Module):
                 forward_batch,
                 residual,
             )
+            # Save a clone to avoid in-place modification issues
+            intermediate_outputs.append(hidden_states.clone().detach())
+
         hidden_states, _ = self.norm(hidden_states, residual)
-        return hidden_states
+        return hidden_states, intermediate_outputs
 
     # If this function is called, it should always initialize KV cache scale
     # factors (or else raise an exception). Thus, handled exceptions should
@@ -380,10 +384,16 @@ class Qwen2ForCausalLM(nn.Module):
         input_embeds: torch.Tensor = None,
         get_embedding: bool = False,
     ) -> torch.Tensor:
-        hidden_states = self.model(input_ids, positions, forward_batch, input_embeds)
+        hidden_states, intermediate_outputs = self.model(
+            input_ids, positions, forward_batch, input_embeds
+        )
         if not get_embedding:
             return self.logits_processor(
-                input_ids, hidden_states, self.lm_head, forward_batch
+                input_ids,
+                hidden_states,
+                self.lm_head,
+                forward_batch,
+                intermediate_layer_outputs=intermediate_outputs,
             )
         else:
             return self.pooler(hidden_states, forward_batch)

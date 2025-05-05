@@ -577,6 +577,11 @@ async def openai_v1_chat_completions(raw_request: Request):
     return await v1_chat_completions(_global_state.tokenizer_manager, raw_request)
 
 
+@app.post("/v1/chat/completions_debug")
+async def openai_v1_chat_completions_debug(raw_request: Request):
+    return await v1_chat_completions(_global_state.tokenizer_manager, raw_request, debug=True)
+
+
 @app.post("/v1/embeddings", response_class=ORJSONResponse)
 async def openai_v1_embeddings(raw_request: Request):
     response = await v1_embeddings(_global_state.tokenizer_manager, raw_request)
