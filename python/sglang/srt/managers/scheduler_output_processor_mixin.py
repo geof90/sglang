@@ -584,10 +584,10 @@ class SchedulerOutputProcessorMixin:
                         req.output_token_ids_logprobs_idx
                     )
 
-                # if req.return_hidden_states:
-                if output_hidden_states is None:
-                    output_hidden_states = []
-                output_hidden_states.append(req.hidden_states)
+                if req.return_hidden_states:
+                    if output_hidden_states is None:
+                        output_hidden_states = []
+                    output_hidden_states.append(req.hidden_states)
 
                 output_intermediate_layer_outputs = req.intermediate_layer_outputs
 

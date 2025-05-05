@@ -1754,9 +1754,12 @@ async def v1_chat_completions(
         )
 
     # Non-streaming response.
-    ret = await tokenizer_manager.generate_request(
-        adapted_request, raw_request
-    ).__anext__()
+    try:
+        ret = await tokenizer_manager.generate_request(
+            adapted_request, raw_request
+        ).__anext__()
+    except ValueError as e:
+        return create_error_response(str(e))
     if not isinstance(ret, list):
         ret = [ret]
 
