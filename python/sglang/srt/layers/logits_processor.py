@@ -75,7 +75,7 @@ class LogitsProcessorOutput:
     input_token_ids_logprobs_idx: Optional[List] = None
 
     # Intermediate layer outputs from the model for debugging
-    intermediate_layers_outputs: Optional[List[torch.Tensor]] = None
+    intermediate_layer_outputs: Optional[List[torch.Tensor]] = None
 
 
 @dataclasses.dataclass

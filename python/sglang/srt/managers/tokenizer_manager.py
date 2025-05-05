@@ -1054,6 +1054,11 @@ class TokenizerManager:
             if getattr(recv_obj, "output_hidden_states", None):
                 meta_info["hidden_states"] = recv_obj.output_hidden_states[i]
 
+            if getattr(recv_obj, "output_intermediate_layer_outputs", None):
+                meta_info[
+                    "intermediate_layer_outputs"
+                ] = recv_obj.output_intermediate_layer_outputs[i]
+
             if isinstance(recv_obj, BatchStrOut):
                 out_dict = {
                     "text": recv_obj.output_strs[i],

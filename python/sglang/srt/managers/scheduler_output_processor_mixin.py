@@ -122,12 +122,10 @@ class SchedulerOutputProcessorMixin:
                         )
                     
                     if logits_output.intermediate_layer_outputs is not None:
-                        req.intermediate_layer_outputs.append(
-                            [
-                                layer_out.cpu().clone().tolist()
-                                for layer_out in logits_output.intermediate_layer_outputs
-                            ]
-                        )
+                        req.intermediate_layer_outputs = [
+                            layer_out.cpu().clone().tolist()
+                            for layer_out in logits_output.intermediate_layer_outputs
+                        ]
 
                     if req.grammar is not None:
                         req.grammar.accept_token(next_token_id)
@@ -495,6 +493,7 @@ class SchedulerOutputProcessorMixin:
         cached_tokens = []
         spec_verify_ct = []
         output_hidden_states = None
+        output_intermediate_layer_outputs = None
 
         if return_logprob:
             input_token_logprobs_val = []
@@ -590,6 +589,8 @@ class SchedulerOutputProcessorMixin:
                     output_hidden_states = []
                 output_hidden_states.append(req.hidden_states)
 
+                output_intermediate_layer_outputs = req.intermediate_layer_outputs
+
         # Send to detokenizer
         if rids:
             if self.model_config.is_multimodal_gen:
@@ -622,6 +623,7 @@ class SchedulerOutputProcessorMixin:
                     output_token_ids_logprobs_val,
                     output_token_ids_logprobs_idx,
                     output_hidden_states,
+                    output_intermediate_layer_outputs,
                 )
             )
 

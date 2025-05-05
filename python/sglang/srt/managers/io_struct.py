@@ -601,6 +601,9 @@ class BatchTokenIDOut:
     # Hidden states
     output_hidden_states: List[List[float]]
 
+    # Intermediate layer outputs
+    output_intermediate_layer_outputs: List[List[List[float]]]
+
 
 @dataclass
 class BatchMultimodalDecodeReq:
@@ -647,6 +650,9 @@ class BatchStrOut:
 
     # Hidden states
     output_hidden_states: List[List[float]]
+
+    # Intermediate layer outputs
+    output_intermediate_layer_outputs: List[List[List[float]]]
 
 
 @dataclass
