@@ -77,6 +77,7 @@ class UsageInfo(BaseModel):
     completion_tokens: Optional[int] = 0
     # only used to return cached tokens when --enable-cache-report is set
     prompt_tokens_details: Optional[Dict[str, int]] = None
+    intermediate_layer_outputs: Optional[List[List[List[float]]]] = None
 
 
 class StreamOptions(BaseModel):

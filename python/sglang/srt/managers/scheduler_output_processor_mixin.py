@@ -120,6 +120,14 @@ class SchedulerOutputProcessorMixin:
                             .clone()
                             .tolist()
                         )
+                    
+                    if logits_output.intermediate_layer_outputs is not None:
+                        req.intermediate_layer_outputs.append(
+                            [
+                                layer_out.cpu().clone().tolist()
+                                for layer_out in logits_output.intermediate_layer_outputs
+                            ]
+                        )
 
                     if req.grammar is not None:
                         req.grammar.accept_token(next_token_id)
@@ -258,6 +266,14 @@ class SchedulerOutputProcessorMixin:
             if req.return_hidden_states and logits_output.hidden_states is not None:
                 req.hidden_states.append(
                     logits_output.hidden_states[i].cpu().clone().tolist()
+                )
+
+            if logits_output.intermediate_layer_outputs is not None:
+                req.intermediate_layer_outputs.append(
+                    [
+                        layer_out.cpu().clone().tolist()
+                        for layer_out in logits_output.intermediate_layer_outputs
+                    ]
                 )
 
             if req.grammar is not None and batch.spec_algorithm.is_none():
@@ -569,10 +585,10 @@ class SchedulerOutputProcessorMixin:
                         req.output_token_ids_logprobs_idx
                     )
 
-                if req.return_hidden_states:
-                    if output_hidden_states is None:
-                        output_hidden_states = []
-                    output_hidden_states.append(req.hidden_states)
+                # if req.return_hidden_states:
+                if output_hidden_states is None:
+                    output_hidden_states = []
+                output_hidden_states.append(req.hidden_states)
 
         # Send to detokenizer
         if rids:

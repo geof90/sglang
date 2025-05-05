@@ -74,6 +74,9 @@ class LogitsProcessorOutput:
     input_token_ids_logprobs_val: Optional[List] = None
     input_token_ids_logprobs_idx: Optional[List] = None
 
+    # Intermediate layer outputs from the model for debugging
+    intermediate_layers_outputs: Optional[List[torch.Tensor]] = None
+
 
 @dataclasses.dataclass
 class LogitsMetadata:
@@ -224,6 +227,7 @@ class LogitsProcessor(nn.Module):
         lm_head: VocabParallelEmbedding,
         logits_metadata: Union[LogitsMetadata, ForwardBatch],
         aux_hidden_states: Optional[torch.Tensor] = None,
+        intermediate_layer_outputs: Optional[List[torch.Tensor]] = None,
     ) -> LogitsProcessorOutput:
         if isinstance(logits_metadata, ForwardBatch):
             logits_metadata = LogitsMetadata.from_forward_batch(logits_metadata)
@@ -352,6 +356,7 @@ class LogitsProcessor(nn.Module):
             return LogitsProcessorOutput(
                 next_token_logits=sampled_logits,
                 hidden_states=hidden_states_to_store,
+                intermediate_layer_outputs=intermediate_layer_outputs,
             )
         else:
             input_logprobs = logits[input_logprob_indices]
@@ -407,6 +412,7 @@ class LogitsProcessor(nn.Module):
                 hidden_states=hidden_states_to_store,
                 input_token_ids_logprobs_val=input_token_ids_logprobs_val,
                 input_token_ids_logprobs_idx=input_token_ids_logprobs_idx,
+                intermediate_layer_outputs=intermediate_layer_outputs,
             )
 
     def _get_logits(
